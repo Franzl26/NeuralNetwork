@@ -1,10 +1,10 @@
-def mean_squared_error(y, y_quer):
-    return (y - y_quer) * (y - y_quer)
+def squared_error(ist, soll):
+    return (ist - soll) ** 2
 
 
-def mean_total_error(y, y_quer):
-    return abs(y - y_quer)
+def total_error(ist, soll):
+    return abs(ist - soll)
 
 
-def mean_bias_error(y, y_quer):
-    return y - y_quer
+def bias_error(ist, soll):
+    return ist - soll
