@@ -11,7 +11,7 @@ def get_net(anz_neurons, func, func_derivation=None, weight_random=False):
             for end in range(1, anz_neurons[layer + 1] + 1):
                 s = str(layer + 1) + str(start) + str(end)
                 if weight_random:
-                    w[s] = random.random() * 2 - 1
+                    w[s] = random.random() * 1 - 0.5
                 else:
                     w[s] = 0
     for layer in range(1, len(anz_neurons)):
@@ -172,6 +172,7 @@ def train_backpropagation(net, data, lernrate, fehlerformel, ausgabe=False):
                 for anz in range(1, net["anz"][layer] + 1):
                     s_neuron = f"{layer}{anz}"
                     sig_der = f_der[s_neuron](neuron_in[s_neuron])
+                    # print(sample[1][anz - 1])
                     fehler = fehlerformel(neuron_out[s_neuron], sample[1][anz - 1])
                     deltas[s_neuron] = sig_der * fehler
             else:
