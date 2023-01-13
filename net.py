@@ -119,7 +119,8 @@ def train_perceptron(net, data, ausgabe=False):
                 a += w[s] * sample[0][anz_in - 1]
             a -= b[s_bias]
             y = net["f"]["11"](a)
-            print("y = " + str(y) + "  ", end="")
+            if ausgabe:
+                print("y = " + str(y) + "  ", end="")
             for anz_in in range(1, net["anz"][0] + 1):
                 s = "1" + str(anz_in) + str(anz_out)
                 w[s] += (sample[1][anz_out - 1] - y) * sample[0][anz_in - 1]
