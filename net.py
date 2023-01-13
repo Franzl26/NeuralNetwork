@@ -1,7 +1,7 @@
 import random
 
 
-def get_net(anz_neurons, func, func_derivation=None, weight_random=False):
+def get_net(anz_neurons, func, func_derivation=None, weight_random=False, bias_random=False):
     w = {}
     b = {}
     f = {}
@@ -11,13 +11,16 @@ def get_net(anz_neurons, func, func_derivation=None, weight_random=False):
             for end in range(1, anz_neurons[layer + 1] + 1):
                 s = str(layer + 1) + str(start) + str(end)
                 if weight_random:
-                    w[s] = random.random() * 1 - 0.5
+                    w[s] = random.random() * 2 - 1
                 else:
                     w[s] = 0
     for layer in range(1, len(anz_neurons)):
         for neu in range(1, anz_neurons[layer] + 1):
             s = str(layer) + str(neu)
-            b[s] = 0
+            if bias_random:
+                b[s] = random.random() * 2 - 1
+            else:
+                b[s] = 0
             f[s] = func
             f_der[s] = func_derivation
 
@@ -214,8 +217,7 @@ def train_backpropagation(net, data, lernrate, fehlerformel, fehlerformel_ableit
         print(f"w {count}: {w} {b}")
 
 
-"""
-def train_backpropagation_v2(net, data, lernrate, fehlerformel, ausgabe=False):
+def train_backpropagation_bias(net, data, lernrate, fehlerformel, fehlerformel_ableitung, ausgabe=False):
     if net["f_der"] is None:
         print("Keine Ableitung der Übertragungsfunktion vorhanden")
         raise ValueError
@@ -225,7 +227,7 @@ def train_backpropagation_v2(net, data, lernrate, fehlerformel, ausgabe=False):
     count = 0
     for sample in data:
         if ausgabe:
-            print(f"{count} {w} {b}")
+            print(f"w {count}: {w} {b}")
 
         # Vorwärts
         erg = list(sample[0])
@@ -245,10 +247,13 @@ def train_backpropagation_v2(net, data, lernrate, fehlerformel, ausgabe=False):
                 summe -= b[s_bias]
                 neuron_in[s_bias] = summe
                 calc = net["f"][f"{layer}{anz_out}"](summe)
-                erg_neu.append(calc)
                 neuron_out[s_bias] = calc
+                erg_neu.append(calc)
             erg = erg_neu
             erg_neu = []
+
+        # print("in : " + str(neuron_in))
+        # print("out: " + str(neuron_out))
 
         # Deltas ausrechnen
         f_der = net["f_der"]
@@ -258,7 +263,12 @@ def train_backpropagation_v2(net, data, lernrate, fehlerformel, ausgabe=False):
                 for anz in range(1, net["anz"][layer] + 1):
                     s_neuron = f"{layer}{anz}"
                     sig_der = f_der[s_neuron](neuron_in[s_neuron])
-                    fehler = fehlerformel(neuron_out[s_neuron], sample[1][anz - 1])
+                    # print(sample[1][anz - 1])
+                    # fehler = fehlerformel(neuron_out[s_neuron], sample[1][anz - 1])
+                    fehler = fehlerformel_ableitung(neuron_out[s_neuron], sample[1][anz - 1])
+                    # print("sig_der:" + str(sig_der))
+                    # print("fehler :" + str(fehler))
+                    # print("delta  :" + str(sig_der * fehler))
                     deltas[s_neuron] = sig_der * fehler
             else:
                 for anz_cur in range(1, net["anz"][layer] + 1):
@@ -273,6 +283,7 @@ def train_backpropagation_v2(net, data, lernrate, fehlerformel, ausgabe=False):
 
         # Gewichtsänderungen ausrechnen und anpassen
         delta_w = {}
+        delta_bias = {}
         for layer in range(net["layers"] - 1, 0, -1):
             for anz in range(1, net["anz"][layer] + 1):
                 s_neuron = f"{layer}{anz}"
@@ -282,11 +293,15 @@ def train_backpropagation_v2(net, data, lernrate, fehlerformel, ausgabe=False):
                     delta = - lernrate * deltas[s_neuron] * neuron_out[s_neuron_last]
                     delta_w[s_con] = delta
                     w[s_con] += delta
+                    # Bias anpassen
+                    delta_b = lernrate * deltas[s_neuron]
+                    b[s_neuron] += delta_b
+                    delta_bias[s_neuron] = delta_b
 
         if ausgabe:
-            print(f"deltas: {deltas}")
-            print(f"deltas der Gewichte: {delta_w}")
+            print(f"ẟ  : {deltas}")
+            print(f"Δw : {delta_w}")
+            print(f"Δb : {delta_bias}")
         count += 1
     if ausgabe:
-        print(f"{count} {w} {b}")
-"""
+        print(f"w {count}: {w} {b}")
