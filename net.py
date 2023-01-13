@@ -130,7 +130,7 @@ def train_perceptron(net, data, ausgabe=False):
         print(str(count) + " " + str(w) + " " + str(b))
 
 
-def train_backpropagation(net, data, lernrate, fehlerformel, ausgabe=False):
+def train_backpropagation(net, data, lernrate, fehlerformel, fehlerformel_ableitung, ausgabe=False):
     if net["f_der"] is None:
         print("Keine Ableitung der Übertragungsfunktion vorhanden")
         raise ValueError
@@ -140,7 +140,7 @@ def train_backpropagation(net, data, lernrate, fehlerformel, ausgabe=False):
     count = 0
     for sample in data:
         if ausgabe:
-            print(f"{count} {w} {b}")
+            print(f"w {count}: {w} {b}")
 
         # Vorwärts
         erg = list(sample[0])
@@ -160,10 +160,13 @@ def train_backpropagation(net, data, lernrate, fehlerformel, ausgabe=False):
                 summe -= b[s_bias]
                 neuron_in[s_bias] = summe
                 calc = net["f"][f"{layer}{anz_out}"](summe)
-                erg_neu.append(calc)
                 neuron_out[s_bias] = calc
+                erg_neu.append(calc)
             erg = erg_neu
             erg_neu = []
+
+        # print("in : " + str(neuron_in))
+        # print("out: " + str(neuron_out))
 
         # Deltas ausrechnen
         f_der = net["f_der"]
@@ -174,7 +177,11 @@ def train_backpropagation(net, data, lernrate, fehlerformel, ausgabe=False):
                     s_neuron = f"{layer}{anz}"
                     sig_der = f_der[s_neuron](neuron_in[s_neuron])
                     # print(sample[1][anz - 1])
-                    fehler = fehlerformel(neuron_out[s_neuron], sample[1][anz - 1])
+                    # fehler = fehlerformel(neuron_out[s_neuron], sample[1][anz - 1])
+                    fehler = fehlerformel_ableitung(neuron_out[s_neuron], sample[1][anz - 1])
+                    # print("sig_der:" + str(sig_der))
+                    # print("fehler :" + str(fehler))
+                    # print("delta  :" + str(sig_der * fehler))
                     deltas[s_neuron] = sig_der * fehler
             else:
                 for anz_cur in range(1, net["anz"][layer] + 1):
@@ -200,11 +207,11 @@ def train_backpropagation(net, data, lernrate, fehlerformel, ausgabe=False):
                     w[s_con] += delta
 
         if ausgabe:
-            print(f"deltas: {deltas}")
-            print(f"deltas der Gewichte: {delta_w}")
+            print(f"ẟ  : {deltas}")
+            print(f"Δw : {delta_w}")
         count += 1
     if ausgabe:
-        print(f"{count} {w} {b}")
+        print(f"w {count}: {w} {b}")
 
 
 """
